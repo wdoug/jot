@@ -27,7 +27,7 @@ exports.findNotesMetadata = function (callback) {
 	filter.ascending = false;
 	filter.order = 1;
 	var offset = 0;
-	var maxNotes = 5;
+	var maxNotes = 15;
 	var resultSpec = new Evernote.NotesMetadataResultSpec();
 	resultSpec.includeTitle = true;
 
@@ -81,7 +81,12 @@ exports.createNote = function (noteTitle, noteBody, parentNotebook, callback) {
  
   // Create note object
   var ourNote = new Evernote.Note();
-  ourNote.title = noteTitle;
+  if (noteTitle === '') {
+    ourNote.title = 'Untitled';
+  }
+  else {
+    ourNote.title = noteTitle;
+  }
   ourNote.content = nBody;
  
   // parentNotebook is optional; if omitted, default notebook is used
@@ -114,7 +119,12 @@ exports.updateNote = function (guid, noteTitle, noteBody, callback) {
   // Create note object
   var ourNote = new Evernote.Note();
   ourNote.guid = guid;
-  ourNote.title = noteTitle;
+  if (noteTitle === '') {
+    ourNote.title = 'Untitled';
+  }
+  else {
+    ourNote.title = noteTitle;
+  }
   ourNote.content = nBody;
 
   // Attempt to update note in Evernote account
@@ -129,7 +139,7 @@ exports.updateNote = function (guid, noteTitle, noteBody, callback) {
       callback();
     }
   });
-}
+};
 
 exports.trashNote = function (guid, callback) {
 	noteStore.deleteNote(guid, function (err, note) {
@@ -141,7 +151,7 @@ exports.trashNote = function (guid, callback) {
 			callback(err, note);
 		}
 	});
-}
+};
 
 function logErrors(err, data, callback) {
 	if (err) {
