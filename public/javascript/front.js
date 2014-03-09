@@ -9,10 +9,10 @@ var Note = function (title, content, guid) {
         '<input type="text" class="title" placeholder="Title"></input>' +
         '<div contenteditable class="content" data-placeholder="note"></div>' +
         '<div class="options">' +
-        	'<input type="button" class="trash" value="Trash"></input>' + 
+          '<input type="button" class="trash" value="Trash"></input>' +
         '</div>' +
       '</div>');
-	if (title !== undefined) {
+	if (title !== undefined && title !== 'Untitled') {
 		note.find('.title').val(title);
 	}
 	else {
