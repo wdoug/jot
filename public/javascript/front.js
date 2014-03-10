@@ -6,8 +6,8 @@
 // TODO put methods in Node.prototype
 var Note = function (title, content, guid) {
     var note = $('<div class="note">' +
-        '<input type="text" class="title" placeholder="Title"></input>' +
-        '<div contenteditable class="content" data-placeholder="note"></div>' +
+        '<input type="text" class="title" placeholder="Title">' +
+        '<textarea class="content" placeholder="note"></textarea>' +
         '<div class="options">' +
             '<input type="button" class="trash" value="Trash"></input>' +
         '</div>' +
@@ -18,14 +18,11 @@ var Note = function (title, content, guid) {
     else {
         note.find('.title').hide();
     }
-    if (content !== undefined) {
-        note.find('.content').append(content)
-                             .on('click', 'a', function () {
-            // TODO: Handle link clicks
-            console.log( 'Clicked link: ' + $(this).attr('href') );
-        });
+    if (content !== undefined && content !== null) {
+        note.find('.content').val(content);
     }
-    if (guid !== undefined) {
+
+    if (guid !== undefined && guid !== '') {
         note.attr('data-guid', guid);
     }
     else {
@@ -60,10 +57,6 @@ var Note = function (title, content, guid) {
 };
 
 $( document ).ready( function () {
-    // Older versions of Android don't support contentEditable
-    // will need some sort of fallback in future (Possibly to textarea).
-    // This check's if it is supported
-    var isContentEditable = 'isContentEditable' in document.createElement('span');
 
     $('#notes').prepend( new Note() );
 
@@ -79,7 +72,7 @@ $( document ).ready( function () {
     }).then( function () {
         $('.note:not(.new-note)').each( function (index, element) {
             $.get('notes/' + $( element ).data('guid'), function ( note ) {
-                $( element ).find('.content').append( note.content );
+                $( element ).find('.content').val( note.content );
             });
         });
     });
@@ -89,16 +82,13 @@ $( document ).ready( function () {
         $('.note.new-note').each( function (index, element) {
             var noteContent = {
                 'title': $( element ).find('.title').val(),
-                'content': $( element ).find('.content').html()
+                'content': $( element ).find('.content').val()
             };
             if (noteContent.title !== '' || noteContent.content !== '') {
                 $.post('/createNote', noteContent, function ( response ) {
                     $( element ).attr('data-guid', response.guid);
                 });
                 $( element ).removeClass('new-note').removeClass('changed');
-                // Wrap content in <en-note></en-note> xml for Evernote
-                var content = $( element ).find('.content');
-                content.html('<en-note>' + content.html() + '</en-note>');
             }
         });
 
@@ -109,7 +99,7 @@ $( document ).ready( function () {
                 data: {
                     'guid': $(this).data('guid'),
                     'title': $(this).find('.title').val(),
-                    'content': $(this).find('.content').html()
+                    'content': $(this).find('.content').val()
                 },
                 success: function ( response ) {
                     console.log('' + response + ' updated note success');
