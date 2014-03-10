@@ -1,62 +1,62 @@
 /* apply a natural box layout model to all elements */
 *, *:before, *:after
-  -moz-box-sizing border-box
-  -webkit-box-sizing border-box 
-  box-sizing border-box
+    -moz-box-sizing border-box
+    -webkit-box-sizing border-box 
+    box-sizing border-box
 
 body
-  margin 0
-  font 14px "Lucida Grande", Helvetica, Arial, sans-serif
+    margin 0
+    font 14px "Lucida Grande", Helvetica, Arial, sans-serif
 a
-  color #00B7FF
+    color #00B7FF
 
 #top-bar
-  background-color #eee
-  position fixed
-  width 100%
-  top 0
-  box-shadow 0 1px 3px #999
-  input[type='search']
-    float right
-  menu
-    display none
+    background-color #eee
+    position fixed
+    width 100%
+    top 0
+    box-shadow 0 1px 3px #999
+    input[type='search']
+        float right
+    menu
+        display none
 
 #notes
-  margin-top 3em
+    margin-top 3em
 
 .note
-  margin 20px
-  font: 16px "Lucida Grande", Helvetica, Arial, sans-serif
-  box-shadow 0 1px 2px #999 
-  .title
-    font-size 20px
-    width 100%
-    padding .5em 20px
-    border none 
-    outline none
-    background none
-  .content
-    width 100%
-    padding 0.5em 20px
-    border none
-    outline none
-    background none
-    &:empty:before
-      content attr(data-placeholder)
-      color rgba(125, 125, 125, 0.5)
-  .options
-    visibility hidden
-  &:hover .options
-    visibility visible
-  &.active
-    border-left 4px solid orange
+    margin 20px
+    font: 16px "Lucida Grande", Helvetica, Arial, sans-serif
+    box-shadow 0 1px 2px #999 
+    .title
+        font-size 20px
+        width 100%
+        padding .5em 20px
+        border none 
+        outline none
+        background none
+    .content
+        width 100%
+        padding 0.5em 20px
+        border none
+        outline none
+        background none
+        &:empty:before
+            content attr(data-placeholder)
+            color rgba(125, 125, 125, 0.5)
     .options
-      visibility visible
+        visibility hidden
+    &:hover .options
+        visibility visible
+    &.active
+        border-left 4px solid orange
+        .options
+            visibility visible
 
 
 @media all and (min-width: 701px)
-  .note
-    width 700px
-    margin-left auto
-    margin-right auto
+    .note
+        width 700px
+        margin-left auto
+        margin-right auto
 
