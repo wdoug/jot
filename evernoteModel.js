@@ -17,7 +17,7 @@ exports.listNotebooks = function (callback) {
             console.log(err);
         }
         else {
-            callback(notebooks);
+            callback(err, notebooks);
         }
     });
 };
@@ -36,7 +36,7 @@ exports.findNotesMetadata = function (callback) {
             console.log(err);
         }
         else {
-            callback(notes);
+            callback(err, notes);
         }
     });
 };
@@ -47,7 +47,7 @@ exports.getNotebook = function (guid, callback) {
             console.log(err);
         }
         else {
-            callback(notebooks);
+            callback(err, notebooks);
         }
     });
 };
@@ -68,7 +68,7 @@ exports.getNote = function (guid, options, callback) {
             console.log(err);
         }
         else {
-            callback(note);
+            callback(err, note);
         }
     });
 };
@@ -103,7 +103,7 @@ exports.createNote = function (noteTitle, noteBody, parentNotebook, callback) {
         console.log('Error creating note:');
         console.log(err);
     } else {
-        callback(note);
+        callback(err, note);
     }
     });
  
@@ -136,7 +136,7 @@ exports.updateNote = function (guid, noteTitle, noteBody, callback) {
         console.log('Error updating note:');
         console.log(err);
     } else {
-        callback();
+        callback(err, note);
     }
     });
 };
