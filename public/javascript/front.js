@@ -7,11 +7,12 @@
 var Note = function (title, content, guid) {
     var note = $('<div class="note">' +
         '<input type="text" class="title" placeholder="Title">' +
-        '<textarea class="content" placeholder="note"></textarea>' +
+        '<textarea class="content" placeholder="note" style="resize:none;"></textarea>' +
         '<div class="options">' +
             '<input type="button" class="trash" value="Trash"></input>' +
         '</div>' +
       '</div>');
+    note.find('.content').autosize();
     if (title !== undefined && title !== 'Untitled') {
         note.find('.title').val(title);
     }
@@ -19,7 +20,7 @@ var Note = function (title, content, guid) {
         note.find('.title').hide();
     }
     if (content !== undefined && content !== null) {
-        note.find('.content').val(content);
+        note.find('.content').val(content).trigger('autosize.resize');
     }
 
     if (guid !== undefined && guid !== '') {
@@ -72,7 +73,7 @@ $( document ).ready( function () {
     }).then( function () {
         $('.note:not(.new-note)').each( function (index, element) {
             $.get('notes/' + $( element ).data('guid'), function ( note ) {
-                $( element ).find('.content').val( note.content );
+                $( element ).find('.content').val( note.content ).trigger('autosize.resize');
             });
         });
     });
