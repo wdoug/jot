@@ -4,6 +4,7 @@ var routes = require('./routes');
 var path = require('path');
 
 var model = require('./evernoteModel');
+var login = require('./evernoteLogin');
 
 var app = express();
 
@@ -13,11 +14,19 @@ app.set('view engine', 'ejs');
 app.use(express.bodyParser());
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.cookieParser('secret'));
+app.use(express.session());
+
 
 app.get('/', routes.index);
 
+app.get('/login', login.oauth);
+app.get('/oauth_callback', login.oauth_callback);
+app.get('/logout', login.clear);
+
+
 app.get('/notebooks', function (req, res) {
-    model.listNotebooks(function (err, notebooks) {
+    model.listNotebooks(req, res, function (err, notebooks) {
         if (err) {
             res.send(500, err);
         }
@@ -29,7 +38,7 @@ app.get('/notebooks', function (req, res) {
 
 app.get('/notebook/:guid', function (req, res) {
     var guid = req.params.guid;
-    model.getNotebook(guid, function (err, notebook) {
+    model.getNotebook(req, res, guid, function (err, notebook) {
         if (err) {
             res.send(500, err);
         }
@@ -40,7 +49,7 @@ app.get('/notebook/:guid', function (req, res) {
 });
 
 app.get('/notes', function (req, res) {
-    model.findNotesMetadata(function (err, noteData) {
+    model.findNotesMetadata(req, res, function (err, noteData) {
         //console.log('noteData',noteData);
         noteData.notes.forEach(function (note) { note.url = '/notes/' + note.guid;});
         if (err) {
@@ -55,7 +64,7 @@ app.get('/notes', function (req, res) {
 app.get('/notes/:noteId', function (req, res) {
     var noteId = req.params.noteId;
     var options = { 'content': true };
-    model.getNote(noteId, options, function (err, note) {
+    model.getNote(req, res, noteId, options, function (err, note) {
         if (err) {
             res.send(500, err);
         }
@@ -68,7 +77,7 @@ app.get('/notes/:noteId', function (req, res) {
 app.post('/createNote', function (req, res) {
     var title = req.body.title,
         body = req.body.content || '';
-    model.createNote(title, body, {}, function (err, note) {
+    model.createNote(req, res, title, body, {}, function (err, note) {
         if (err) {
             res.send(500, err);
         }
@@ -87,7 +96,7 @@ app.put('/updateNote', function (req, res) {
     console.log('Going to update note...');
     console.log('title: ' + title);
     console.log('guid: ' + guid);
-    model.updateNote(guid, title, body, function (err, note) {
+    model.updateNote(req, res, guid, title, body, function (err, note) {
         if (err) {
             res.send(500, err);
         }
@@ -98,7 +107,7 @@ app.put('/updateNote', function (req, res) {
 });
 
 app.del('/notes/:guid', function (req, res) {
-    model.trashNote(req.params.guid, function (err, note) {
+    model.trashNote(req, res, req.params.guid, function (err, note) {
         if (err) {
             res.send(500, err);
         }
