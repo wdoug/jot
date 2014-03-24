@@ -9,6 +9,7 @@
         "express": "3.4.8",
         "ejs": "*",
         "stylus": "*",
-        "evernote": "~1.25.2"
+        "evernote": "~1.25.2",
+        "xmldom": "~0.1.19"
     }
 }
