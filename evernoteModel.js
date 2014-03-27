@@ -1,6 +1,7 @@
 'use strict';
 
 var Evernote = require('evernote').Evernote;
+var DOMParser = require('xmldom').DOMParser;
 var config = require('./config');
 
 //var developerToken = config.token;
@@ -107,6 +108,9 @@ exports.getNote = function (req, res, guid, options, callback) {
             callback(err);
         }
         else {
+            var xmlContent = new DOMParser().parseFromString(note.content, 'text/xml');
+            var content = xmlContent.getElementsByTagName('en-note')[0];
+            note.content = getChildNodeValues(content);
             callback(err, note);
         }
     });
@@ -157,10 +161,8 @@ exports.updateNote = function (req, res, guid, noteTitle, noteBody, callback) {
 
     var nBody = '<?xml version="1.0" encoding="UTF-8"?>';
     nBody += '<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">';
-    nBody += noteBody.replace('<!--?xml version="1.0" encoding="UTF-8"?-->', '');
+    nBody += '<en-note>' + noteBody + '</en-note>';
 
-    console.log('content: ' + nBody);
- 
     // Create note object
     var ourNote = new Evernote.Note();
     ourNote.guid = guid;
@@ -201,3 +203,22 @@ exports.trashNote = function (req, res, guid, callback) {
         }
     });
 };
+
+// Recursively goes through child nodes and gets the values
+function getChildNodeValues(node) {
+    if (node.hasChildNodes()) {
+        var values = '';
+        for (var i = 0; i < node.childNodes.length; i += 1) {
+            // TODO change to context sensitive new lines
+            values += getChildNodeValues(node.childNodes[i]) + '\n';
+        }
+        return values;
+    }
+    // TODO check if value has multiple instances of &nbsp;
+    else if (node.nodeValue && node.nodeValue !== '&nbsp;') {
+        return node.nodeValue;
+    }
+    else {
+        return '';
+    }
+}
