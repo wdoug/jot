@@ -40,6 +40,7 @@ exports.listNotebooks = function (req, res, callback) {
     noteStore.listNotebooks(function (err, notebooks) {
         if (err) {
             console.log(err);
+            callback(err);
         }
         else {
             callback(err, notebooks);
@@ -62,6 +63,7 @@ exports.findNotesMetadata = function (req, res, callback) {
     noteStore.findNotesMetadata(filter, offset, maxNotes, resultSpec, function(err, notes) {
         if (err) {
             console.log(err);
+            callback(err);
         }
         else {
             req.session.notes = notes;
@@ -77,6 +79,7 @@ exports.getNotebook = function (req, res, guid, callback) {
     noteStore.getNotebook(guid, function(err, notebooks) {
         if (err) {
             console.log(err);
+            callback(err);
         }
         else {
             callback(err, notebooks);
@@ -101,6 +104,7 @@ exports.getNote = function (req, res, guid, options, callback) {
         if (err) {
             console.log('Couldn\'t get note: '+ guid);
             console.log(err);
+            callback(err);
         }
         else {
             callback(err, note);
@@ -119,16 +123,16 @@ exports.createNote = function (req, res, noteTitle, noteBody, parentNotebook, ca
     // Create note object
     var ourNote = new Evernote.Note();
     if (noteTitle === '') {
-    ourNote.title = 'Untitled';
+        ourNote.title = 'Untitled';
     }
     else {
-    ourNote.title = noteTitle;
+        ourNote.title = noteTitle;
     }
     ourNote.content = nBody;
  
     // parentNotebook is optional; if omitted, default notebook is used
     if (parentNotebook && parentNotebook.guid) {
-    ourNote.notebookGuid = parentNotebook.guid;
+        ourNote.notebookGuid = parentNotebook.guid;
     }
  
     // Attempt to create note in Evernote account
@@ -139,6 +143,7 @@ exports.createNote = function (req, res, noteTitle, noteBody, parentNotebook, ca
             // http://dev.evernote.com/documentation/reference/Errors.html#Enum_EDAMErrorCode
             console.log('Error creating note:');
             console.log(err);
+            callback(err);
         } else {
             callback(err, note);
         }
@@ -160,10 +165,10 @@ exports.updateNote = function (req, res, guid, noteTitle, noteBody, callback) {
     var ourNote = new Evernote.Note();
     ourNote.guid = guid;
     if (noteTitle === '') {
-    ourNote.title = 'Untitled';
+        ourNote.title = 'Untitled';
     }
     else {
-    ourNote.title = noteTitle;
+        ourNote.title = noteTitle;
     }
     ourNote.content = nBody;
 
@@ -175,6 +180,7 @@ exports.updateNote = function (req, res, guid, noteTitle, noteBody, callback) {
             // http://dev.evernote.com/documentation/reference/Errors.html#Enum_EDAMErrorCode
             console.log('Error updating note:');
             console.log(err);
+            callback(err);
         } else {
             callback(err, note);
         }
@@ -195,12 +201,3 @@ exports.trashNote = function (req, res, guid, callback) {
         }
     });
 };
-
-function logErrors(err, data, callback) {
-    if (err) {
-        console.log(err);
-    }
-    else {
-        callback(data);
-    }
-}
