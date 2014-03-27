@@ -11,18 +11,22 @@ var config = require('./config');
 //var noteStore = client.getNoteStore();
 
 function getNoteStore(req, res) {
-    var client;
+    var noteStore;
     if (req.session.oauthAccessToken) {
         var token = req.session.oauthAccessToken;
-        client = new Evernote.Client({
+        var client = new Evernote.Client({
             token: token,
             sandbox: config.SANDBOX
         });
-        return client.getNoteStore();
+        noteStore = client.getNoteStore();
     }
     else if (config.use_developer_token) {
-        client = new Evernote.Client({token: config.token});
-        return client.getNoteStore();
+        var client = new Evernote.Client({token: config.token});
+        noteStore = client.getNoteStore();
+    }
+    
+    if (noteStore) {
+        return noteStore;
     }
     else {
         console.log('Not signed in');
