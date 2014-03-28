@@ -3,7 +3,9 @@
 var Evernote = require('evernote').Evernote;
 
 var config = require('./config.json');
-var callbackUrl = 'http://localhost:8080/oauth_callback';
+
+// TODO figure out how to make this not local specific
+var callbackUrl = 'http://localhost:3000/oauth_callback';
 
 // OAuth
 exports.oauth = function (req, res) {
