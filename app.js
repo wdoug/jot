@@ -19,6 +19,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.cookieParser('secret'));
 app.use(express.session());
 
+// development only
+if ('development' == app.get('env')) {
+  app.use(express.errorHandler());
+}
+
 
 app.get('/', routes.index);
 
