@@ -11,5 +11,8 @@
         "stylus": "*",
         "evernote": "~1.25.2",
         "xmldom": "~0.1.19"
+    },
+    "engines": {
+        "node": "0.10.x"
     }
 }
