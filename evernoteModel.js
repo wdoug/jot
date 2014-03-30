@@ -12,16 +12,17 @@ var config = require('./config');
 
 function getNoteStore(req, res) {
     var noteStore;
+    var client;
     if (req.session.oauthAccessToken) {
         var token = req.session.oauthAccessToken;
-        var client = new Evernote.Client({
+        client = new Evernote.Client({
             token: token,
             sandbox: config.SANDBOX
         });
         noteStore = client.getNoteStore();
     }
     else if (config.use_developer_token) {
-        var client = new Evernote.Client({token: config.token});
+        client = new Evernote.Client({token: config.token});
         noteStore = client.getNoteStore();
     }
     

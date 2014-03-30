@@ -1,4 +1,4 @@
 
 exports.index = function(req, res){
-    res.render('index', { title: 'Notes' });
+    res.render('index', { title: 'Jot' });
 };
