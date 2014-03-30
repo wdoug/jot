@@ -2,13 +2,21 @@
 
 var Evernote = require('evernote').Evernote;
 var DOMParser = require('xmldom').DOMParser;
-var config = require('./config');
 
-//var developerToken = config.token;
-//var client = new Evernote.Client({token: developerToken});
- 
-// Set up the NoteStore client 
-//var noteStore = client.getNoteStore();
+var config;
+// If config.json isn't defined use environment variables
+try {
+    config = require('./config.json');
+}
+catch(err) {
+    config = {
+        'use_developer_token': process.env.USE_DEV_TOKEN || false,
+        'token': process.env.EVERNOTE_DEV_TOKEN,
+        'API_CONSUMER_KEY' : process.env.EVERNOTE_API_KEY,
+        'API_CONSUMER_SECRET' : process.env.EVERNOTE_API_SECRET,
+        'SANDBOX' : process.env.EVERNOTE_SANDBOX || true
+    };
+}
 
 function getNoteStore(req, res) {
     var noteStore;

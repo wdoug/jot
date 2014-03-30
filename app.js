@@ -3,7 +3,17 @@ var express = require('express');
 var http = require('http');
 var routes = require('./routes');
 var path = require('path');
-var config = require('./config.json');
+
+var config;
+// If config.json isn't defined use environment variables
+try {
+    config = require('./config.json');
+}
+catch(err) {
+    config = {
+        'cookie_parser_secret': process.env.COOKIE_SECRET
+    };
+}
 
 var model = require('./evernoteModel');
 var login = require('./evernoteLogin');
