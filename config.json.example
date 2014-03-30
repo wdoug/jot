@@ -1,4 +1,5 @@
 {
+    "cookie_parser_secret": "cookie secret",
     "use_developer_token": false,
     "token": "Your Evernote Sandbox Token",
     "API_CONSUMER_KEY" : "YOUR API CONSUMER KEY",

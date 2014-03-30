@@ -3,6 +3,7 @@ var express = require('express');
 var http = require('http');
 var routes = require('./routes');
 var path = require('path');
+var config = require('./config.json');
 
 var model = require('./evernoteModel');
 var login = require('./evernoteLogin');
@@ -17,7 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.cookieParser('secret'));
+app.use(express.cookieParser(config.cookie_parser_secret));
 app.use(express.session());
 
 // development only
