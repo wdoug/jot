@@ -28,7 +28,8 @@ Need
 * [Evernote API Key](http://dev.evernote.com/doc/) with access level set to full 
 
 1. Copy 'config.json.example' and rename to 'config.json'.
-2. Add API_CONSUMER_KEY and API_CONSUMER_SECRET to config.json.
+2. Change config.json "cookie secret" to another string.
+3. Add API_CONSUMER_KEY and API_CONSUMER_SECRET to config.json.
 
 Run:
 ```
