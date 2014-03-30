@@ -15,7 +15,11 @@
             <input type="button" id="sync-button" value="Sync">
             <span><%= title %></span>
             <input type="button" id="new-note-button" value="New Note">
-            <input type="search" placeholder="search">
+            <div class="right">
+                <input type="search" placeholder="search">
+                <input type="button" id="login-button" value="Log In" onclick="location.href='/login'">
+                <input type="button" id="logout-button" value="Log Out" onclick="location.href='/logout'">
+            </div>
             <menu id="options"></menu>
         </section>
         

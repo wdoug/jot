@@ -1,15 +1,34 @@
 jot (working title)
 ===
 
-Setup:
+## Setup for personal account only
 
 Need 
-* Node.js (http://nodejs.org/)
+* [Node.js](http://nodejs.org/)
 * Account on https://sandbox.evernote.com/
 * A developer token from this account: https://sandbox.evernote.com/api/DeveloperToken.action
 
-Copy 'config.json.example' and rename to 'config.json'.
-Add sandbox developer token to config.json.
+1. Copy 'config.json.example' and rename to 'config.json'.
+2. Add sandbox developer token to config.json.
+3. Set 'use_developer_token' to `true`.
+
+Run:
+```
+npm install
+
+node app.js
+```
+
+
+## Setup for Evernote API authentication
+
+Need 
+* [Node.js](http://nodejs.org/)
+* Account on https://sandbox.evernote.com/
+* [Evernote API Key](http://dev.evernote.com/doc/) with access level set to full 
+
+1. Copy 'config.json.example' and rename to 'config.json'.
+2. Add API_CONSUMER_KEY and API_CONSUMER_SECRET to config.json.
 
 Run:
 ```

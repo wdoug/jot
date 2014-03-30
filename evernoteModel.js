@@ -4,18 +4,48 @@ var Evernote = require('evernote').Evernote;
 var DOMParser = require('xmldom').DOMParser;
 var config = require('./config');
 
-var developerToken = config.token;
-
-var client = new Evernote.Client({token: developerToken});
+//var developerToken = config.token;
+//var client = new Evernote.Client({token: developerToken});
  
 // Set up the NoteStore client 
-var noteStore = client.getNoteStore();
+//var noteStore = client.getNoteStore();
+
+function getNoteStore(req, res) {
+    var noteStore;
+    if (req.session.oauthAccessToken) {
+        var token = req.session.oauthAccessToken;
+        var client = new Evernote.Client({
+            token: token,
+            sandbox: config.SANDBOX
+        });
+        noteStore = client.getNoteStore();
+    }
+    else if (config.use_developer_token) {
+        var client = new Evernote.Client({token: config.token});
+        noteStore = client.getNoteStore();
+    }
+    
+    if (noteStore) {
+        return noteStore;
+    }
+    else {
+        console.log('Not signed in');
+
+        res.redirect('/login');
+
+        return false;
+    }
+}
  
 // Make API calls
-exports.listNotebooks = function (callback) {
+exports.listNotebooks = function (req, res, callback) {
+    var noteStore = getNoteStore(req, res);
+    if (!noteStore) { return; }
+    
     noteStore.listNotebooks(function (err, notebooks) {
         if (err) {
             console.log(err);
+            callback(err);
         }
         else {
             callback(err, notebooks);
@@ -23,7 +53,10 @@ exports.listNotebooks = function (callback) {
     });
 };
 
-exports.findNotesMetadata = function (callback) {
+exports.findNotesMetadata = function (req, res, callback) {
+    var noteStore = getNoteStore(req, res);
+    if (!noteStore) { return; }
+
     var filter = new Evernote.NoteFilter();
     filter.ascending = false;
     filter.order = 1;
@@ -35,17 +68,23 @@ exports.findNotesMetadata = function (callback) {
     noteStore.findNotesMetadata(filter, offset, maxNotes, resultSpec, function(err, notes) {
         if (err) {
             console.log(err);
+            callback(err);
         }
         else {
+            req.session.notes = notes;
             callback(err, notes);
         }
     });
 };
 
-exports.getNotebook = function (guid, callback) {
+exports.getNotebook = function (req, res, guid, callback) {
+    var noteStore = getNoteStore(req, res);
+    if (!noteStore) { return; }
+
     noteStore.getNotebook(guid, function(err, notebooks) {
         if (err) {
             console.log(err);
+            callback(err);
         }
         else {
             callback(err, notebooks);
@@ -53,7 +92,10 @@ exports.getNotebook = function (guid, callback) {
     });
 };
 
-exports.getNote = function (guid, options, callback) {
+exports.getNote = function (req, res, guid, options, callback) {
+    var noteStore = getNoteStore(req, res);
+    if (!noteStore) { return; }
+
     var withContent = options.content || false;
     var withResourcesData = options.resourcesData || false;
     var withResourcesRecognition = options.resourcesRecognition || false;
@@ -67,6 +109,7 @@ exports.getNote = function (guid, options, callback) {
         if (err) {
             console.log('Couldn\'t get note: '+ guid);
             console.log(err);
+            callback(err);
         }
         else {
             var xmlContent = new DOMParser().parseFromString(note.content, 'text/xml');
@@ -77,8 +120,10 @@ exports.getNote = function (guid, options, callback) {
     });
 };
 
-exports.createNote = function (noteTitle, noteBody, parentNotebook, callback) {
- 
+exports.createNote = function (req, res, noteTitle, noteBody, parentNotebook, callback) {
+    var noteStore = getNoteStore(req, res);
+    if (!noteStore) { return; }
+
     var nBody = '<?xml version="1.0" encoding="UTF-8"?>';
     nBody += '<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">';
     nBody += '<en-note>' + noteBody + '</en-note>';
@@ -86,34 +131,38 @@ exports.createNote = function (noteTitle, noteBody, parentNotebook, callback) {
     // Create note object
     var ourNote = new Evernote.Note();
     if (noteTitle === '') {
-    ourNote.title = 'Untitled';
+        ourNote.title = 'Untitled';
     }
     else {
-    ourNote.title = noteTitle;
+        ourNote.title = noteTitle;
     }
     ourNote.content = nBody;
  
     // parentNotebook is optional; if omitted, default notebook is used
     if (parentNotebook && parentNotebook.guid) {
-    ourNote.notebookGuid = parentNotebook.guid;
+        ourNote.notebookGuid = parentNotebook.guid;
     }
  
     // Attempt to create note in Evernote account
     noteStore.createNote(ourNote, function (err, note) {
-    if (err) {
-        // Something was wrong with the note data
-        // See EDAMErrorCode enumeration for error code explanation
-        // http://dev.evernote.com/documentation/reference/Errors.html#Enum_EDAMErrorCode
-        console.log('Error creating note:');
-        console.log(err);
-    } else {
-        callback(err, note);
-    }
+        if (err) {
+            // Something was wrong with the note data
+            // See EDAMErrorCode enumeration for error code explanation
+            // http://dev.evernote.com/documentation/reference/Errors.html#Enum_EDAMErrorCode
+            console.log('Error creating note:');
+            console.log(err);
+            callback(err);
+        } else {
+            callback(err, note);
+        }
     });
  
 };
 
-exports.updateNote = function (guid, noteTitle, noteBody, callback) {
+exports.updateNote = function (req, res, guid, noteTitle, noteBody, callback) {
+    var noteStore = getNoteStore(req, res);
+    if (!noteStore) { return; }
+
     var nBody = '<?xml version="1.0" encoding="UTF-8"?>';
     nBody += '<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">';
     nBody += '<en-note>' + noteBody + '</en-note>';
@@ -122,28 +171,32 @@ exports.updateNote = function (guid, noteTitle, noteBody, callback) {
     var ourNote = new Evernote.Note();
     ourNote.guid = guid;
     if (noteTitle === '') {
-    ourNote.title = 'Untitled';
+        ourNote.title = 'Untitled';
     }
     else {
-    ourNote.title = noteTitle;
+        ourNote.title = noteTitle;
     }
     ourNote.content = nBody;
 
     // Attempt to update note in Evernote account
     noteStore.updateNote(ourNote, function (err, note) {
-    if (err) {
-        // Something was wrong with the note data
-        // See EDAMErrorCode enumeration for error code explanation
-        // http://dev.evernote.com/documentation/reference/Errors.html#Enum_EDAMErrorCode
-        console.log('Error updating note:');
-        console.log(err);
-    } else {
-        callback(err, note);
-    }
+        if (err) {
+            // Something was wrong with the note data
+            // See EDAMErrorCode enumeration for error code explanation
+            // http://dev.evernote.com/documentation/reference/Errors.html#Enum_EDAMErrorCode
+            console.log('Error updating note:');
+            console.log(err);
+            callback(err);
+        } else {
+            callback(err, note);
+        }
     });
 };
 
-exports.trashNote = function (guid, callback) {
+exports.trashNote = function (req, res, guid, callback) {
+    var noteStore = getNoteStore(req, res);
+    if (!noteStore) { return; }
+
     noteStore.deleteNote(guid, function (err, note) {
         if (err) {
             console.log(err);
@@ -154,15 +207,6 @@ exports.trashNote = function (guid, callback) {
         }
     });
 };
-
-function logErrors(err, data, callback) {
-    if (err) {
-        console.log(err);
-    }
-    else {
-        callback(data);
-    }
-}
 
 // Recursively goes through child nodes and gets the values
 function getChildNodeValues(node) {
