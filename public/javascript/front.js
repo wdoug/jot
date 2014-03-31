@@ -90,10 +90,10 @@ $( document ).ready( function () {
         $('#notes').prepend( new Note() );
     });
 
-    loadSequentialNotes(5);
+    loadSequentialNotes(15);
 
     $('#load-notes-button').on('click', function () {
-        loadSequentialNotes(5);
+        loadSequentialNotes(15);
     });
 
     // Sync
