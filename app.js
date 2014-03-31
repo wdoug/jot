@@ -68,7 +68,25 @@ app.get('/notebook/:guid', function (req, res) {
 });
 
 app.get('/notes', function (req, res) {
-    model.findNotesMetadata(req, res, function (err, noteData) {
+    var options = { };
+    model.findNotesMetadata(req, res, options, function (err, noteData) {
+        //console.log('noteData',noteData);
+        noteData.notes.forEach(function (note) { note.url = '/notes/' + note.guid;});
+        if (err) {
+            res.send(500, err);
+        }
+        else {
+            res.send(200, noteData);
+        }
+    });
+});
+
+app.get('/notes/start/:startNote/total/:numNotes', function (req, res) {
+    var options = {
+        offset: req.params.startNote,
+        maxNotes: req.params.numNotes
+    };
+    model.findNotesMetadata(req, res, options, function (err, noteData) {
         //console.log('noteData',noteData);
         noteData.notes.forEach(function (note) { note.url = '/notes/' + note.guid;});
         if (err) {

@@ -1,5 +1,7 @@
 'use strict';
 
+var noteIndex = 0;
+
 // Once this is implemented: http://bugs.jquery.com/ticket/12031
 // This class definition can be cleaned up
 
@@ -48,6 +50,7 @@ var Note = function (title, content, guid) {
             $.ajax('/notes/' + guid, {
                 type: 'DELETE'
             });
+            noteIndex -= 1;
         }
         // TODO: Check if this will cause memory leaks 
         // from old references
@@ -57,6 +60,28 @@ var Note = function (title, content, guid) {
     return note;
 };
 
+function loadNotes(startIndex, numNotes) {
+    $.get('/notes/start/' + startIndex + '/total/' + numNotes, function ( data ) {
+        for (var i = 0; i < data.notes.length; ++i) {
+            $('#notes').append(
+                new Note(data.notes[i].title, null, data.notes[i].guid).addClass('loading')
+            );
+            noteIndex += 1;
+        }
+    }).then( function () {
+        $('.note.loading').each( function (index, element) {
+            $.get('notes/' + $( element ).data('guid'), function ( note ) {
+                $( element ).find('.content').val( note.content ).trigger('autosize.resize');
+                $( element ).removeClass('loading');
+            });
+        });
+    });
+}
+
+function loadSequentialNotes(numNotes) {
+    loadNotes(noteIndex, numNotes);
+}
+
 $( document ).ready( function () {
 
     $('#notes').prepend( new Note() );
@@ -65,17 +90,10 @@ $( document ).ready( function () {
         $('#notes').prepend( new Note() );
     });
 
-    // load some recent notes
-    $.get('/notes', function ( data ) {
-        for (var i = 0; i < data.notes.length; ++i) {
-            $('#notes').append( new Note(data.notes[i].title, null, data.notes[i].guid) );
-        }
-    }).then( function () {
-        $('.note:not(.new-note)').each( function (index, element) {
-            $.get('notes/' + $( element ).data('guid'), function ( note ) {
-                $( element ).find('.content').val( note.content ).trigger('autosize.resize');
-            });
-        });
+    loadSequentialNotes(5);
+
+    $('#load-notes-button').on('click', function () {
+        loadSequentialNotes(5);
     });
 
     // Sync
@@ -88,8 +106,9 @@ $( document ).ready( function () {
             if (noteContent.title !== '' || noteContent.content !== '') {
                 $.post('/createNote', noteContent, function ( response ) {
                     $( element ).attr('data-guid', response.guid);
+                    $( element ).removeClass('new-note').removeClass('changed');
+                    noteIndex += 1;
                 });
-                $( element ).removeClass('new-note').removeClass('changed');
             }
         });
 
@@ -104,9 +123,9 @@ $( document ).ready( function () {
                 },
                 success: function ( response ) {
                     console.log('' + response + ' updated note success');
+                    $(this).removeClass('changed');
                 }
             });
-            $(this).removeClass('changed');
         });
     });
 });
