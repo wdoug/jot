@@ -62,15 +62,15 @@ exports.listNotebooks = function (req, res, callback) {
     });
 };
 
-exports.findNotesMetadata = function (req, res, callback) {
+exports.findNotesMetadata = function (req, res, options, callback) {
     var noteStore = getNoteStore(req, res);
     if (!noteStore) { return; }
 
     var filter = new Evernote.NoteFilter();
-    filter.ascending = false;
-    filter.order = 1;
-    var offset = 0;
-    var maxNotes = 15;
+    filter.ascending = options.ascending || false;
+    filter.order = options.order || 1;
+    var offset = options.offset || 0;
+    var maxNotes = options.maxNotes || 15;
     var resultSpec = new Evernote.NotesMetadataResultSpec();
     resultSpec.includeTitle = true;
 
