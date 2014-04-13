@@ -40,7 +40,7 @@ function getNoteStore(req, res) {
     else {
         console.log('Not signed in');
 
-        res.redirect('/login');
+        res.redirect('/welcome');
 
         return false;
     }

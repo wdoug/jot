@@ -1,3 +1,7 @@
+highlight-color = orange
+highlight-mid = #F39F05
+highlight-darker = #EC9B06
+
 /* apply a natural box layout model to all elements */
 *, *:before, *:after
     -moz-box-sizing border-box
@@ -56,9 +60,33 @@ input[type=button]
     &:hover .options
         visibility visible
     &.active
-        border-left 4px solid orange
+        border-left 4px solid highlight-color
         .options
             visibility visible
+
+.center
+    margin-left auto
+    margin-right auto
+
+.button
+    text-decoration none
+    color white
+    border-radius 5px
+    box-sizing content-box
+    padding 10px
+    &:hover
+        background-color highlight-mid
+    &:active
+        background-color highlight-darker
+        border 1px solid rgba(0,0,0,0.1)
+
+.highlight
+    background-color highlight-color
+
+
+#about
+    width 400px
+    text-align center
 
 
 @media all and (min-width: 701px)

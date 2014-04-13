@@ -38,6 +38,7 @@ if ('development' == app.get('env')) {
 
 
 app.get('/', routes.index);
+app.get('/welcome', routes.welcome);
 
 app.get('/login', login.oauth);
 app.get('/oauth_callback', login.oauth_callback);
